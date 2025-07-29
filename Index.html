@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChilliHub Roblox Joiner</title>
+    <script>
+        // Extrai os parâmetros da URL
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            const results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Redireciona para o protocolo roblox://
+        function redirectToRoblox() {
+            const placeId = getParameterByName('placeId');
+            const gameInstanceId = getParameterByName('gameInstanceId');
+            
+            if (placeId) {
+                let robloxUrl = `roblox://placeId=${placeId}`;
+                
+                if (gameInstanceId) {
+                    robloxUrl += `&gameInstanceId=${gameInstanceId}`;
+                }
+                
+                window.location.href = robloxUrl;
+                
+                // Fallback caso o protocolo não seja suportado
+                setTimeout(function() {
+                    window.location.href = `https://www.roblox.com/games/${placeId}`;
+                }, 1000);
+            } else {
+                document.getElementById('status').innerHTML = 
+                    'Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID';
+            }
+        }
+    </script>
+</head>
+<body onload="redirectToRoblox()">
+    <div id="status">Redirecionando para o Roblox...</div>
+</body>
+</html>
