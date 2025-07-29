@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OnezFPS Roblox Joiner</title>
+    </title>Steal a Brainrot Joiner</title>
+    <meta http-equiv="refresh" content="0;url=javascript:redirectToRoblox()">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,62 +34,79 @@
 </head>
 <body>
     <div class="container">
-        <h1>OnezFPS Roblox Joiner</h1>
+        <h1> Steal a Brainrot Joiner</h1>
         <div id="status" class="loading">Redirecionando para o Roblox...</div>
         <p>Se o redirecionamento não funcionar automaticamente, <a id="manualLink" href="#">clique aqui</a>.</p>
     </div>
 
     <script>
-        // Extrai os parâmetros da URL
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-            const results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        // Extrai os parâmetros da URL de forma mais eficiente
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                placeId: params.get('placeId'),
+                gameInstanceId: params.get('gameInstanceId')
+            };
+        }
+
+        // Mostra mensagem de erro
+        function showError(message) {
+            const statusElement = document.getElementById('status');
+            statusElement.innerHTML = message;
+            statusElement.className = 'error';
         }
 
         // Redireciona para o protocolo roblox://
         function redirectToRoblox() {
-            const placeId = getParameterByName('placeId');
-            const gameInstanceId = getParameterByName('gameInstanceId');
+            const { placeId, gameInstanceId } = getUrlParams();
             const statusElement = document.getElementById('status');
             const manualLink = document.getElementById('manualLink');
             
-            if (placeId) {
-                let robloxUrl = `roblox://placeId=${placeId}`;
-                let webUrl = `https://www.roblox.com/games/${placeId}`;
-                
-                if (gameInstanceId) {
-                    robloxUrl += `&gameInstanceId=${gameInstanceId}`;
-                    webUrl += `?gameInstanceId=${gameInstanceId}`;
-                }
-                
-                // Atualiza o link manual
-                manualLink.href = robloxUrl;
-                manualLink.onclick = function() {
-                    window.location.href = robloxUrl;
-                    return false;
-                };
-                
-                // Tenta redirecionar automaticamente
-                window.location.href = robloxUrl;
-                
-                // Fallback caso o protocolo não seja suportado
-                setTimeout(function() {
-                    statusElement.innerHTML = 'Redirecionamento automático falhou. <a href="' + robloxUrl + '">Clique aqui</a> para tentar novamente ou <a href="' + webUrl + '">acesse a página web</a>.';
-                    statusElement.className = 'error';
-                }, 1500);
-            } else {
-                statusElement.innerHTML = 'Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID';
-                statusElement.className = 'error';
+            if (!placeId) {
+                showError('Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID');
+                return;
             }
+
+            // Validação dos IDs
+            if (!/^\d+$/.test(placeId)) {
+                showError('Place ID inválido. Deve conter apenas números.');
+                return;
+            }
+
+            if (gameInstanceId && !/^[a-f0-9-]{36}$/i.test(gameInstanceId)) {
+                showError('Game Instance ID inválido. Deve ser um UUID válido.');
+                return;
+            }
+
+            const robloxUrl = `roblox://placeId=${placeId}${gameInstanceId ? `&gameInstanceId=${gameInstanceId}` : ''}`;
+            const webUrl = `https://www.roblox.com/games/${placeId}${gameInstanceId ? `?gameInstanceId=${gameInstanceId}` : ''}`;
+            
+            // Configura o link manual
+            manualLink.href = robloxUrl;
+            manualLink.onclick = () => {
+                window.location.href = robloxUrl;
+                return false;
+            };
+            
+            // Redirecionamento imediato
+            try {
+                window.location.replace(robloxUrl);
+            } catch (e) {
+                console.error('Erro no redirecionamento:', e);
+            }
+            
+            // Fallback após 1 segundo
+            setTimeout(() => {
+                if (!document.hidden) { // Só redireciona se a página ainda estiver visível
+                    showError(`Redirecionamento automático falhou. <a href="${robloxUrl}">Clique aqui</a> para tentar novamente ou <a href="${webUrl}">acesse a página web</a>.`);
+                    // Tentativa alternativa de redirecionamento
+                    window.location.href = webUrl;
+                }
+            }, 1000);
         }
 
-        // Executa quando a página carrega
-        window.onload = redirectToRoblox;
+        // Dispara imediatamente ao carregar
+        document.addEventListener('DOMContentLoaded', redirectToRoblox);
     </script>
 </body>
 </html>
