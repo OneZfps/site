@@ -1,112 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    </title>Steal a Brainrot Joiner</title>
-    <meta http-equiv="refresh" content="0;url=javascript:redirectToRoblox()">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        #status {
-            margin: 20px 0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .loading {
-            color: #0066cc;
-        }
-        .error {
-            color: #cc0000;
-            background-color: #ffebeb;
-        }
-    </style>
+	<meta charset="utf-8">
+	<title>Joining Roblox</title>
+	<script>
+		window.onload = function()
+		{
+			const params = new URLSearchParams(window.location.search);
+			const placeId = params.get('placeId');
+			const gameInstanceId = params.get('gameInstanceId');
+
+			if (placeId && gameInstanceId)
+			{
+				window.location.href = `roblox://placeID=${placeId}&gameInstanceId=${gameInstanceId}`;
+			}
+			else
+			{
+				document.body.textContent = "Error: Missing Place ID or Game Instance ID.";
+			}
+		};
+	</script>
 </head>
-<body>
-    <div class="container">
-        <h1> Steal a Brainrot Joiner</h1>
-        <div id="status" class="loading">Redirecionando para o Roblox...</div>
-        <p>Se o redirecionamento não funcionar automaticamente, <a id="manualLink" href="#">clique aqui</a>.</p>
-    </div>
-
-    <script>
-        // Extrai os parâmetros da URL de forma mais eficiente
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                placeId: params.get('placeId'),
-                gameInstanceId: params.get('gameInstanceId')
-            };
-        }
-
-        // Mostra mensagem de erro
-        function showError(message) {
-            const statusElement = document.getElementById('status');
-            statusElement.innerHTML = message;
-            statusElement.className = 'error';
-        }
-
-        // Redireciona para o protocolo roblox://
-        function redirectToRoblox() {
-            const { placeId, gameInstanceId } = getUrlParams();
-            const statusElement = document.getElementById('status');
-            const manualLink = document.getElementById('manualLink');
-            
-            if (!placeId) {
-                showError('Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID');
-                return;
-            }
-
-            // Validação dos IDs
-            if (!/^\d+$/.test(placeId)) {
-                showError('Place ID inválido. Deve conter apenas números.');
-                return;
-            }
-
-            if (gameInstanceId && !/^[a-f0-9-]{36}$/i.test(gameInstanceId)) {
-                showError('Game Instance ID inválido. Deve ser um UUID válido.');
-                return;
-            }
-
-            const robloxUrl = `roblox://placeId=${placeId}${gameInstanceId ? `&gameInstanceId=${gameInstanceId}` : ''}`;
-            const webUrl = `https://www.roblox.com/games/${placeId}${gameInstanceId ? `?gameInstanceId=${gameInstanceId}` : ''}`;
-            
-            // Configura o link manual
-            manualLink.href = robloxUrl;
-            manualLink.onclick = () => {
-                window.location.href = robloxUrl;
-                return false;
-            };
-            
-            // Redirecionamento imediato
-            try {
-                window.location.replace(robloxUrl);
-            } catch (e) {
-                console.error('Erro no redirecionamento:', e);
-            }
-            
-            // Fallback após 1 segundo
-            setTimeout(() => {
-                if (!document.hidden) { // Só redireciona se a página ainda estiver visível
-                    showError(`Redirecionamento automático falhou. <a href="${robloxUrl}">Clique aqui</a> para tentar novamente ou <a href="${webUrl}">acesse a página web</a>.`);
-                    // Tentativa alternativa de redirecionamento
-                    window.location.href = webUrl;
-                }
-            }, 1000);
-        }
-
-        // Dispara imediatamente ao carregar
-        document.addEventListener('DOMContentLoaded', redirectToRoblox);
-    </script>
-</body>
+<body></body>
 </html>
