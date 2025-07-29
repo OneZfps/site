@@ -1,7 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ChilliHub Roblox Joiner</title>
+    <title>OnezFPS Roblox Joiner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .loading {
+            color: #0066cc;
+        }
+        .error {
+            color: #cc0000;
+            background-color: #ffebeb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OnezFPS Roblox Joiner</h1>
+        <div id="status" class="loading">Redirecionando para o Roblox...</div>
+        <p>Se o redirecionamento não funcionar automaticamente, <a id="manualLink" href="#">clique aqui</a>.</p>
+    </div>
+
     <script>
         // Extrai os parâmetros da URL
         function getParameterByName(name, url) {
@@ -18,28 +54,41 @@
         function redirectToRoblox() {
             const placeId = getParameterByName('placeId');
             const gameInstanceId = getParameterByName('gameInstanceId');
+            const statusElement = document.getElementById('status');
+            const manualLink = document.getElementById('manualLink');
             
             if (placeId) {
                 let robloxUrl = `roblox://placeId=${placeId}`;
+                let webUrl = `https://www.roblox.com/games/${placeId}`;
                 
                 if (gameInstanceId) {
                     robloxUrl += `&gameInstanceId=${gameInstanceId}`;
+                    webUrl += `?gameInstanceId=${gameInstanceId}`;
                 }
                 
+                // Atualiza o link manual
+                manualLink.href = robloxUrl;
+                manualLink.onclick = function() {
+                    window.location.href = robloxUrl;
+                    return false;
+                };
+                
+                // Tenta redirecionar automaticamente
                 window.location.href = robloxUrl;
                 
                 // Fallback caso o protocolo não seja suportado
                 setTimeout(function() {
-                    window.location.href = `https://www.roblox.com/games/${placeId}`;
-                }, 1000);
+                    statusElement.innerHTML = 'Redirecionamento automático falhou. <a href="' + robloxUrl + '">Clique aqui</a> para tentar novamente ou <a href="' + webUrl + '">acesse a página web</a>.';
+                    statusElement.className = 'error';
+                }, 1500);
             } else {
-                document.getElementById('status').innerHTML = 
-                    'Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID';
+                statusElement.innerHTML = 'Parâmetros inválidos. Use: ?placeId=ID&gameInstanceId=ID';
+                statusElement.className = 'error';
             }
         }
+
+        // Executa quando a página carrega
+        window.onload = redirectToRoblox;
     </script>
-</head>
-<body onload="redirectToRoblox()">
-    <div id="status">Redirecionando para o Roblox...</div>
 </body>
 </html>
